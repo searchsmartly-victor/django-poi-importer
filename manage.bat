@@ -25,6 +25,8 @@ goto end
 
 :setup
 echo Setting up development environment...
+echo Ensuring required directories exist...
+if not exist "poi_ingest\logs" mkdir poi_ingest\logs
 call :install
 call :migrate
 echo.
@@ -42,6 +44,8 @@ goto end
 
 :migrate
 echo Running database migrations...
+echo Ensuring required directories exist...
+if not exist "poi_ingest\logs" mkdir poi_ingest\logs
 python manage.py makemigrations
 python manage.py migrate
 goto end

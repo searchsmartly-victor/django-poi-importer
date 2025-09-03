@@ -4,22 +4,23 @@ Django web application for importing and managing Point of Interest data from CS
 
 **Quick Access**: Visit `http://127.0.0.1:8000/` and you'll be automatically redirected to the admin interface!
 
-## Run Project Easily
-
-Run poi_ingest/run_project.bat
-
-## Run Project From Scratch
+### Manual Setup (Step by Step)
 
 ### Prerequisites
 
 - Python 3.10+ (tested with Python 3.13.3)
 - Git
 
-### Step 1: Clone and Setup
+### Step 1: Navigate to Project Directory
 ```bash
-git clone <repository-url>
+#  IMPORTANT: Must be in poi_ingest directory, not root!
+# Copy pois.csv to data folder.
+Copy pois.csv to ./data folder.
 cd poi_ingest
+```
 
+### Step 2: Create Virtual Environment
+```bash
 # Create virtual environment
 python -m venv venv
 
@@ -30,18 +31,24 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-### Step 2: Install Dependencies
+### Step 3: Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 3: Database Setup
+### Step 4: Create Required Directories
+```bash
+# Create logs directory (prevents logging errors)
+mkdir logs
+```
+
+### Step 5: Database Setup
 ```bash
 # Create database tables
 python manage.py migrate
 ```
 
-### Step 4: Create Admin User
+### Step 6: Create Admin User
 ```bash
 # Option 1: Create your own admin user
 python manage.py createsuperuser
@@ -50,23 +57,23 @@ python manage.py createsuperuser
 # Username: demo, Password: demo123 (already created)
 ```
 
-### Step 5: Load Sample Data
+### Step 7: Load Sample Data
 ```bash
 # Import POI data from sample files (takes ~10 seconds)
 python manage.py import_poi ../data/ --verbose
 
 # This will import:
-# - CSV: ~999,703 records from pois.csv
 # - JSON: ~1,000 records from JsonData.json  
 # - XML: ~100 records from XmlData.xml
 ```
 
-### Step 6: Start Server
+### Step 8: Start Server
 ```bash
+#  IMPORTANT: Make sure you're in poi_ingest directory!
 python manage.py runserver
 ```
 
-### Step 7: Access Application
+### Step 9: Access Application
 
 Open your browser and visit:
 
@@ -75,21 +82,15 @@ Open your browser and visit:
 - **API Interface**: `http://127.0.0.1:8000/api/poi/` - REST endpoints
 - **Health Check**: `http://127.0.0.1:8000/health/` - System status
 
-## Admin Login
-
-Use either of these admin accounts:
-
-- **Username**: `demo` | **Password**: `demo123`
-- **Username**: `admin` | **Password**: (set during createsuperuser)
 
 ## What You'll See
 
 After loading sample data:
 
-- **36,000+ POI records** from real data files
-- **31 categories** (restaurants, hotels, parks, schools, etc.)
-- **International names** (Japanese, Chinese, Arabic, Hebrew)
-- **3 data sources** (CSV, JSON, XML)
+- **1,100+ POI records** from sample data files
+- **Multiple categories** (restaurants, hotels, parks, schools, etc.)
+- **International names** (Japanese, Chinese, Russian, Arabic)
+- **2 data sources** (JSON, XML)
 
 ## Management Commands
 
@@ -186,7 +187,7 @@ GET http://127.0.0.1:8000/api/poi/?category=restaurant
 GET http://127.0.0.1:8000/api/poi/?external_id=poi_001
 GET http://127.0.0.1:8000/api/poi/?min_rating=4.0
 
-# Utility endpoints
+# Utility endpoints  
 GET http://127.0.0.1:8000/api/poi/categories/
 GET http://127.0.0.1:8000/api/poi/stats/
 ```
@@ -220,13 +221,67 @@ python manage.py test tests.test_admin
 - **Search by internal/external ID**  
 - **Category filtering**
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-**Root URL now redirects** → `http://127.0.0.1:8000/` automatically goes to admin  
-**No admin user?** → Use demo/demo123 or run `python manage.py createsuperuser`  
-**No data?** → Run `python manage.py import_poi ../data/ --verbose`  
-**Server not starting?** → Ensure you're in `poi_ingest` directory  
-**Import errors?** → Check `../data/` directory exists with CSV/JSON/XML files
+### Common Issues and Solutions
+
+** Error: `can't open file 'manage.py': No such file or directory`**
+```bash
+# Solution: You're in the wrong directory!
+cd poi_ingest
+python manage.py runserver
+```
+
+** Error: `Unable to configure handler 'file'` or logging errors**
+```bash
+# Solution: Create the logs directory
+mkdir logs
+# Then run your command again
+```
+
+** Error: Unicode/encoding errors during import**
+```bash
+# Solution: These are warnings, not errors. Data still imports successfully.
+# The application handles international characters correctly.
+```
+
+** No admin user?**
+```bash
+# Solution: Use demo credentials or create new user
+# Username: demo, Password: demo123
+# OR run: python manage.py createsuperuser
+```
+
+** No data showing?**
+```bash
+# Solution: Import sample data
+python manage.py import_poi ../data/ --verbose
+```
+
+** Server not starting?**
+```bash
+# Solution: Check you're in the correct directory
+pwd  # Should show: .../poi_ingest
+ls   # Should show: manage.py, requirements.txt, etc.
+```
+
+** Import errors?**
+```bash
+# Solution: Check data directory exists
+ls ../data/  # Should show: JsonData.json, XmlData.xml
+```
+
+### Directory Structure Check
+Your working directory should look like this:
+```
+poi_ingest/          ← YOU SHOULD BE HERE
+├── manage.py        ← This file should exist
+├── requirements.txt
+├── logs/           ← Create this if missing
+├── poi_ingest/
+├── ingest/
+└── venv/
+```
 
 ## Commands Verified
 

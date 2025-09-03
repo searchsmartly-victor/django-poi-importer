@@ -42,6 +42,11 @@ DEBUG_TOOLBAR_CONFIG = {
     "IS_RUNNING_TESTS": False,  # Disable during tests
 }
 
+# Ensure logs directory exists
+import os
+LOGS_DIR = BASE_DIR / "logs"  # noqa: F405
+os.makedirs(LOGS_DIR, exist_ok=True)
+
 # Development-specific logging with structured formatting
 LOGGING = {  # noqa: F405
     "version": 1,
@@ -65,12 +70,14 @@ LOGGING = {  # noqa: F405
             "class": "logging.StreamHandler",
             "formatter": "structured",
             "level": "INFO",
+            "stream": "ext://sys.stdout",  # Use stdout explicitly
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": BASE_DIR / "logs" / "development.log",  # noqa: F405
+            "filename": LOGS_DIR / "development.log",
             "formatter": "verbose",
             "level": "DEBUG",
+            "encoding": "utf-8",  # Handle Unicode characters properly
         },
     },
     "root": {

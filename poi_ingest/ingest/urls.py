@@ -14,5 +14,5 @@ router.register(r"poi", PointOfInterestViewSet, basename="pointofinterest")
 app_name = "ingest"
 
 urlpatterns = [
-    path("api/", include(router.urls)),
+    path("", include(router.urls)),
 ]
